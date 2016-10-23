@@ -2,9 +2,9 @@ package util
 
 import (
 	"path/filepath"
+	"regexp"
 	"strconv"
 	"strings"
-	"regexp"
 )
 
 var (
@@ -27,8 +27,8 @@ type MemSize struct {
 	Unit int64
 }
 
-func (m MemSize) Bytes() int64 {
-	return int64(m.Value) * m.Unit
+func (this MemSize) Bytes() int64 {
+	return int64(this.Value) * this.Unit
 }
 
 func NewMemSize(size interface{}) *MemSize {

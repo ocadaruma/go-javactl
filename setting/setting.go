@@ -1,19 +1,5 @@
-package settings
+package setting
 
-//import (
-//	"path/filepath"
-//	Assert "github.com/ocadaruma/javagtl/assert"
-//	"os/exec"
-//)
-//
-//type AppSetting struct {
-//	Name string
-//	Home string
-//	Jar string
-//	EntryPoint string
-//	Command string
-//	PidFile string
-//}
 //
 //type JavaSetting struct {
 //
