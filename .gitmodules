@@ -1,0 +1,3 @@
+[submodule "vendor/github.com/go-yaml/yaml"]
+	path = vendor/github.com/go-yaml/yaml
+	url = git@github.com:go-yaml/yaml.git
