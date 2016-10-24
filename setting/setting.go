@@ -1,5 +1,26 @@
 package setting
 
+type Setting struct {
+	ConfigPath string
+	ExtraArgs []string
+	DryRun bool
+	Debug bool
+	AppSetting AppSetting
+	OSSetting OSSetting
+	PreCommands []string
+	PostCommands []string
+}
+
+//func NewSetting(configPath string, extraArgs []string, dryRun bool) *Setting {
+//
+//}
+//
+//func ParseArgs(argv ) {
+//
+//}
+
+
+
 //
 //type JavaSetting struct {
 //
