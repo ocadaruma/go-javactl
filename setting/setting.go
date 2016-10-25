@@ -1,52 +1,45 @@
 package setting
 
+import (
+	"io/ioutil"
+
+	"github.com/go-yaml/yaml"
+)
+
 type Setting struct {
-	ConfigPath string
-	ExtraArgs []string
-	DryRun bool
-	Debug bool
-	AppSetting AppSetting
-	OSSetting OSSetting
-	PreCommands []string
-	PostCommands []string
+	App App
+	Java Java
+	Log *Log
+	OS OS
+	PreCommands  []string `yaml:"pre"`
+	PostCommands []string `yaml:"post"`
 }
 
-//func NewSetting(configPath string, extraArgs []string, dryRun bool) *Setting {
-//
-//}
-//
-//func ParseArgs(argv ) {
-//
-//}
+func LoadSetting(configPath string) (result *Setting, err error) {
+	result, err = load(configPath)
 
+	if err != nil { return }
 
+	app, err := result.App.Normalize()
+	if err != nil { return }
 
-//
-//type JavaSetting struct {
-//
-//}
-//
-//type LogSetting struct {
-//
-//}
-//
-//type OSSetting struct {
-//
-//}
-//
-//type Setting struct {
-//	ConfigPath string
-//	ExtraArgs *[]string
-//	DryRun bool
-//	Debug bool
-//	AppSetting AppSetting
-//	JavaSetting JavaSetting
-//	LogSetting LogSetting
-//	OSSetting OSSetting
-//	PreCommands *[]string
-//	PostCommands *[]string
-//}
-//
-//func (setting *AppSetting) GetArgs(javaArgs *[]string) string {
-//
-//}
+	java, err := result.Java.Normalize()
+	if err != nil { return }
+
+	result.App = *app
+	result.Java = *java
+
+	return
+}
+
+func load(configPath string) (result *Setting, err error) {
+	var buf []byte
+	buf, err = ioutil.ReadFile(configPath)
+
+	if err != nil { return }
+
+	result = &Setting{}
+	err = yaml.Unmarshal(buf, result)
+
+	return
+}

@@ -5,10 +5,9 @@ import (
 )
 
 func TestNewMemSize(t *testing.T) {
-	type TestCase struct {
+	testCases := []struct {
 		actual, expect MemSize
-	}
-	testCases := []TestCase {
+	} {
 		{*NewMemSize(0), MemSize{0, 1}},
 		{*NewMemSize(123), MemSize{123, 1}},
 		{*NewMemSize("0"), MemSize{0, 1}},
@@ -41,10 +40,9 @@ func TestNewMemSize(t *testing.T) {
 }
 
 func TestMemSize_Bytes(t *testing.T) {
-	type TestCase struct {
+	testCases := []struct {
 		actual, expect int64
-	}
-	testCases := []TestCase {
+	} {
 		{NewMemSize("0m").Bytes(), 0},
 		{NewMemSize(123).Bytes(), 123},
 		{NewMemSize("123").Bytes(), 123},
