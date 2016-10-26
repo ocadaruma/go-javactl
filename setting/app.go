@@ -16,7 +16,7 @@ type App struct {
 	PidFile string `yaml:"pid_file"`
 }
 
-func (this App) Normalize() (setting *App, err error) {
+func (this App) Normalize() (err error) {
 	if !filepath.IsAbs(this.Home) {
 		err = fmt.Errorf("app.home(%s) must be an absolute path", this.Home)
 		return
@@ -32,22 +32,12 @@ func (this App) Normalize() (setting *App, err error) {
 		return
 	}
 
-	var j string
-	if this.Jar != "" { j = util.NormalizePath(this.Jar, this.Home) }
+	if this.Jar != "" { this.Jar = util.NormalizePath(this.Jar, this.Home) }
 
-	var c string
-	if this.Command != "" { c = util.NormalizePath(this.Command, this.Home) }
+	if this.Command != "" { this.Command = util.NormalizePath(this.Command, this.Home) }
 
-	var p string
-	if this.PidFile != "" { p = util.NormalizePath(this.PidFile, this.Home) }
-	setting = &App{
-		Name: this.Name,
-		Home: this.Home,
-		Jar: j,
-		EntryPoint: this.EntryPoint,
-		Command: c,
-		PidFile: p,
-	}
+	if this.PidFile != "" { this.PidFile = util.NormalizePath(this.PidFile, this.Home) }
+
 	return
 }
 

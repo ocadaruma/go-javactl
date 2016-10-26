@@ -20,14 +20,10 @@ func LoadSetting(configPath string) (result *Setting, err error) {
 
 	if err != nil { return }
 
-	app, err := result.App.Normalize()
+	err = result.App.Normalize()
 	if err != nil { return }
 
-	java, err := result.Java.Normalize()
-	if err != nil { return }
-
-	result.App = *app
-	result.Java = *java
+	err = result.Java.Normalize()
 
 	return
 }

@@ -1,9 +1,10 @@
 package main
 
 import (
-	//"os"
-	"testing"
+	//"path/filepath"
 	"fmt"
+	"os"
+	"testing"
 )
 
 func tearDown() {
@@ -15,7 +16,8 @@ func TestJavagtl(t *testing.T) {
 
 	//wd, _ := os.Getwd()
 
-	fmt.Println("testing")
+	//templateFile := filepath.Join(wd, "tests", "resources", "test_01.yml.j2")
 
-
+	os.Args = append(os.Args, "abc", "def")
+	main()
 }

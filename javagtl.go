@@ -8,9 +8,15 @@ import (
 )
 
 func main() {
+	var err error
 	fmt.Println("WIP")
-	setting, err := setting.LoadSetting(os.Args[1])
 
-	fmt.Printf("setting: %v", setting)
-	fmt.Printf("error: %v", err)
+	var s *setting.Setting
+	s, err = setting.LoadSetting(os.Args[1])
+
+	fmt.Printf("setting: %v\n", s)
+	fmt.Printf("error: %v\n", err)
+
+	fmt.Printf("args: %v", os.Args)
+
 }

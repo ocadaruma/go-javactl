@@ -15,7 +15,7 @@ type Java struct {
 	Option []string
 }
 
-func (this Java) Normalize() (result *Java, err error) {
+func (this Java) Normalize() (err error) {
 	if this.Home == "" || !filepath.IsAbs(this.Home) {
 		err = fmt.Errorf("java.home(%s) is required and must be an absolute path", this.Home)
 		return
@@ -26,13 +26,13 @@ func (this Java) Normalize() (result *Java, err error) {
 		return
 	}
 
-	memory, err := this.Memory.validate(this.Version)
-	if err != nil { return }
-
-	result = &this
-	result.Memory = memory
+	err = this.Memory.validate(this.Version)
 
 	return
+}
+
+func (this Java) GetExecutable() string {
+	return filepath.Join(this.Home, "bin", "java")
 }
 
 type Memory struct {
@@ -48,7 +48,7 @@ type Memory struct {
 	TargetSurvivorRatio int `yaml:"target_survivor_ratio"`
 }
 
-func (this Memory) validate(javaVersion float32) (result *Memory, err error) {
+func (this Memory) validate(javaVersion float32) (err error) {
 	if this.PermMin != "" && javaVersion >= 1.8 {
 		err = fmt.Errorf("java.memory.perm_min is not applicable to java(%v) >= 1.8", javaVersion)
 		return
@@ -65,7 +65,6 @@ func (this Memory) validate(javaVersion float32) (result *Memory, err error) {
 		err = fmt.Errorf("java.memory.metaspace_max is not applicable to java(%v) < 1.8", javaVersion)
 		return
 	}
-	result = &this
 
 	return
 }
