@@ -24,7 +24,7 @@ func (this Executor) CheckRequirement() (err error) {
 	err = this.checkJavaVersion()
 	if err != nil { return }
 
-	err = this.checkDuplicate()
+	err = this.checkDuplicateProcess()
 
 	return
 }
@@ -54,7 +54,7 @@ func (this Executor) checkJavaVersion() (err error) {
 	return
 }
 
-func (this Executor) checkDuplicate() (err error) {
+func (this Executor) checkDuplicateProcess() (err error) {
 	if !this.Setting.App.IsDuplicateAllowed() {
 		// check pid file existence
 		_, e := os.Stat(this.Setting.App.PidFile)

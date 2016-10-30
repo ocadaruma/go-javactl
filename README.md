@@ -1,4 +1,4 @@
-# javagtl
+# go-javactl
 Re-implementation of [mogproject/javactl](https://github.com/mogproject/javactl) in Go.
 
 YAML-Configurable Java Application Wrapper
@@ -17,4 +17,4 @@ YAML-Configurable Java Application Wrapper
 
 ## Configuration Example
 
-## Launch You Application
+## Launch Your Application

@@ -7,12 +7,24 @@ type Log struct {
 	ErrorLog *ErrorLog `yaml:"error"`
 }
 
+//func (this Log) GetOpts() []string {
+//	result := []string{}
+//
+//	if this.ConsoleLog != nil {
+//		//append(result, this.ConsoleLog.)
+//	}
+//}
+
 type ConsoleLog struct {
 	Prefix string
 	MaxSize string `yaml:"max_size"`
 	Backup int
 	Preserve int
 }
+
+//func (this ConsoleLog) getPath() string {
+//
+//}
 
 type GCLog struct {
 	Prefix string
@@ -21,10 +33,26 @@ type GCLog struct {
 	Preserve int
 }
 
+//func (this GCLog) getPath() string {
+//
+//}
+//
+//func (this GCLog) getOpts() []string {
+//
+//}
+//
 type Dump struct {
 	Prefix string
 }
-
+//
+//func (this Dump) getOpts() []string {
+//
+//}
+//
 type ErrorLog struct {
 	Path string
 }
+//
+//func (this ErrorLog) getOpts() []string {
+//
+//}
