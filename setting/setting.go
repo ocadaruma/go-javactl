@@ -2,6 +2,7 @@ package setting
 
 import (
 	"io/ioutil"
+	"time"
 
 	"github.com/go-yaml/yaml"
 )
@@ -15,7 +16,7 @@ type Setting struct {
 	PostCommands []string `yaml:"post"`
 }
 
-func LoadSetting(configPath string) (result *Setting, err error) {
+func LoadConfig(configPath string) (result *Setting, err error) {
 	result, err = load(configPath)
 
 	if err != nil { return }
@@ -26,6 +27,17 @@ func LoadSetting(configPath string) (result *Setting, err error) {
 	err = result.Java.Normalize()
 
 	return
+}
+
+func (this Setting) GetArgs(now time.Time) []string {
+	result := []string{}
+
+	logArgs := []string{}
+	if this.Log != nil { logArgs = this.Log.GetOpts() }
+
+	this.App.GetArgs()
+
+	return result
 }
 
 func load(configPath string) (result *Setting, err error) {

@@ -17,7 +17,7 @@ func main() {
 	if err != nil { return }
 
 	var s *setting.Setting
-	s, err = setting.LoadSetting(opts.ConfigPath)
+	s, err = setting.LoadConfig(opts.ConfigPath)
 
 	if err != nil { return }
 

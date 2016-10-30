@@ -1,7 +1,9 @@
 package util
 
 import (
+	"fmt"
 	"path/filepath"
+	"reflect"
 	"regexp"
 	"strconv"
 	"strings"
@@ -61,4 +63,32 @@ func NormalizePath(path string, baseDir string) string {
 	} else {
 		return filepath.Join(baseDir, path)
 	}
+}
+
+func EmptyIfZero(format string, value interface{}) (result string) {
+	if value != reflect.Zero(reflect.TypeOf(value)).Interface() {
+		result = fmt.Sprintf(format, value)
+	}
+	return
+}
+
+func EmptyIfNilString(format string, value *string) (result string) {
+	if value != nil {
+		result = fmt.Sprintf(format, *value)
+	}
+	return
+}
+
+func EmptyIfNilInt(format string, value *int) (result string) {
+	if value != nil {
+		result = fmt.Sprintf(format, *value)
+	}
+	return
+}
+
+func EmptyIfNilBool(format string, value *bool) (result string) {
+	if value != nil {
+		result = fmt.Sprintf(format, *value)
+	}
+	return
 }

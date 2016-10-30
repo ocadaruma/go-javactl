@@ -3,6 +3,8 @@ package setting
 import (
 	"fmt"
 	"path/filepath"
+
+	"github.com/ocadaruma/go-javactl/util"
 )
 
 type Java struct {
@@ -29,6 +31,10 @@ func (this Java) Normalize() (err error) {
 	err = this.Memory.validate(this.Version)
 
 	return
+}
+
+func (this Java) getOpts() []string {
+
 }
 
 func (this Java) GetExecutable() string {
@@ -69,9 +75,48 @@ func (this Memory) validate(javaVersion float32) (err error) {
 	return
 }
 
+func (this Memory) getOpts() (result []string) {
+	opts := []string{
+		util.EmptyIfZero("-Xms%s", this.HeapMin),
+		util.EmptyIfZero("-Xmx%s", this.HeapMax),
+		util.EmptyIfZero("-XX:PermSize=%s", this.PermMin),
+		util.EmptyIfZero("-XX:MaxPermSize=%s", this.PermMax),
+		util.EmptyIfZero("-XX:MetaspaceSize=%s", this.MetaspaceMin),
+		util.EmptyIfZero("-XX:MaxMetaspaceSize=%s", this.MetaspaceMax),
+		util.EmptyIfZero("-Xmn%s", this.NewMin),
+		util.EmptyIfZero("-XX:MaxNewSize=%s", this.NewMax),
+		util.EmptyIfZero("-XX:SurvivorRatio=%d", this.SurvivorRatio),
+		util.EmptyIfZero("-XX:TargetSurvivorRatio=%d", this.TargetSurvivorRatio),
+	}
+
+	for _, o := range opts {
+		if o != "" { result = append(result, o) }
+	}
+
+	return
+}
+
 type JMX struct {
 	Port *int
 	SSL *bool
-	Authenticate *string
+	Authenticate *bool
 }
 
+func (this JMX) getOpts() (result []string) {
+	if this.Port != nil {
+		result = append(result,
+			"-Dcom.sun.management.jmxremote",
+			fmt.Sprintf("-Dcom.sun.management.jmxremote.port=%d", *this.Port),
+		)
+
+		if this.SSL != nil {
+			result = append(result,
+				fmt.Sprintf("-Dcom.sun.management.jmxremote.ssl=%t", *this.SSL))
+		}
+		if this.Authenticate != nil {
+			result = append(result,
+				fmt.Sprintf("-Dcom.sun.management.jmxremote.authenticate=%t", *this.Authenticate))
+		}
+	}
+	return
+}
