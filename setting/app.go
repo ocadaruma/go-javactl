@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"path/filepath"
 
-	"github.com/ocadaruma/javagtl/util"
+	"github.com/ocadaruma/go-javactl/util"
 )
 
 type App struct {

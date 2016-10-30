@@ -5,8 +5,8 @@ import (
 	//"fmt"
 	"os"
 
-	"github.com/ocadaruma/javagtl/option"
-	"github.com/ocadaruma/javagtl/setting"
+	"github.com/ocadaruma/go-javactl/option"
+	"github.com/ocadaruma/go-javactl/setting"
 )
 
 var AppVersion string

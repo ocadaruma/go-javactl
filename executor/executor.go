@@ -9,7 +9,7 @@ import (
 	"os/user"
 	"strconv"
 
-	"github.com/ocadaruma/javagtl/setting"
+	"github.com/ocadaruma/go-javactl/setting"
 )
 
 type Executor struct {
