@@ -4,3 +4,6 @@
 [submodule "vendor/github.com/jessevdk/go-flags"]
 	path = vendor/github.com/jessevdk/go-flags
 	url = git@github.com:jessevdk/go-flags
+[submodule "vendor/github.com/natefinch/lumberjack"]
+	path = vendor/github.com/natefinch/lumberjack
+	url = git@github.com:natefinch/lumberjack.git
