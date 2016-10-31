@@ -56,10 +56,10 @@ func NewJavaSetting(java mapping.Java) (result *JavaSetting, err error) {
 }
 
 func (this JavaSetting) GetArgs() []string {
-	return append([]string{this.getExecutable()}, this.getOpts()...)
+	return append([]string{this.GetExecutable()}, this.getOpts()...)
 }
 
-func (this JavaSetting) getExecutable() string {
+func (this JavaSetting) GetExecutable() string {
 	return filepath.Join(this.Home, "bin", "java")
 }
 

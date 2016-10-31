@@ -78,24 +78,14 @@ func TestEmptyIfZero(t *testing.T) {
 }
 
 func TestEmptyIfNil(t *testing.T) {
-	str := "bar"
-	strPtr := &str
-
 	i := 42
 	iPtr := &i
-
-	b := false
-	bPtr := &b
 
 	testCases := []struct {
 		actual, expect string
 	} {
-		{EmptyIfNilString("foo:%s", (*string)(nil)), ""},
-		{EmptyIfNilString("foo:%s", strPtr), "foo:bar"},
 		{EmptyIfNilInt("foo:%d", (*int)(nil)), ""},
 		{EmptyIfNilInt("foo:%d", iPtr), "foo:42"},
-		{EmptyIfNilBool("foo:%t", (*bool)(nil)), ""},
-		{EmptyIfNilBool("foo:%t", bPtr), "foo:false"},
 	}
 
 	for i, c := range testCases {

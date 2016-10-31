@@ -72,21 +72,7 @@ func EmptyIfZero(format string, value interface{}) (result string) {
 	return
 }
 
-func EmptyIfNilString(format string, value *string) (result string) {
-	if value != nil {
-		result = fmt.Sprintf(format, *value)
-	}
-	return
-}
-
 func EmptyIfNilInt(format string, value *int) (result string) {
-	if value != nil {
-		result = fmt.Sprintf(format, *value)
-	}
-	return
-}
-
-func EmptyIfNilBool(format string, value *bool) (result string) {
 	if value != nil {
 		result = fmt.Sprintf(format, *value)
 	}
