@@ -6,9 +6,10 @@ import (
 	"time"
 
 	"github.com/ocadaruma/go-javactl/setting/mapping"
+	"github.com/ocadaruma/go-javactl/util"
 )
 
-func TestSetting_GetArgs(t *testing.T) {
+func TestSetting(t *testing.T) {
 	var err error
 	var config *mapping.YAMLConfig
 	config, err = mapping.LoadConfig("../testdata/example.yml")
@@ -22,6 +23,12 @@ func TestSetting_GetArgs(t *testing.T) {
 
 	if err != nil {
 		t.Errorf("setting instantiatiation must not failed. err : %v", err)
+	}
+
+	consoleMaxSize := *s.Log.ConsoleLog.MaxSize
+	expectedSize := util.MemSize{10, 1 << 20}
+	if consoleMaxSize != expectedSize {
+		t.Errorf("%v must equal to %v", consoleMaxSize, expectedSize)
 	}
 
 	args := s.GetArgs([]string{
@@ -66,7 +73,7 @@ func TestSetting_GetArgs(t *testing.T) {
 		"-Dcom.sun.management.jmxremote.port=20001",
 		"-Dcom.sun.management.jmxremote.ssl=false",
 		"-Dcom.sun.management.jmxremote.authenticate=false",
-		"-Dcom.amazonaws.sdk.disableCertChecking=True",
+		"-Dcom.amazonaws.sdk.disableCertChecking=true",
 		"-Dfile.encoding=UTF-8",
 		"-Dhttp.netty.maxInitialLineLength=8192",
 		"-Dhttp.port=9000",
