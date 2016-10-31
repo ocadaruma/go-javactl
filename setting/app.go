@@ -4,48 +4,59 @@ import (
 	"fmt"
 	"path/filepath"
 
+	"github.com/ocadaruma/go-javactl/setting/mapping"
 	"github.com/ocadaruma/go-javactl/util"
 )
 
-type App struct {
+type AppSetting struct {
 	Name string
 	Home string
 	Jar string
-	EntryPoint string `yaml:"entry_point"`
+	EntryPoint string
 	Command string
-	PidFile string `yaml:"pid_file"`
+	PidFile string
 }
 
-func (this App) Normalize() (err error) {
-	if !filepath.IsAbs(this.Home) {
-		err = fmt.Errorf("app.home(%s) must be an absolute path", this.Home)
+func NewAppSetting(app mapping.App) (result *AppSetting, err error) {
+	if !filepath.IsAbs(app.Home) {
+		err = fmt.Errorf("app.home(%s) must be an absolute path", app.Home)
 		return
 	}
 
-	if (this.Jar != "") == (this.Command != "") {
-		err = fmt.Errorf("either app.jar(%s) or app.command(%s) but not both must be given", this.Jar, this.Command)
+	if (app.Jar != "") == (app.Command != "") {
+		err = fmt.Errorf("either app.jar(%s) or app.command(%s) but not both must be given", app.Jar, app.Command)
 		return
 	}
 
-	if (this.Jar == "") && (this.EntryPoint != "") {
-		err = fmt.Errorf("app.entry_point(%s) must be used with app.jar(%s)", this.EntryPoint, this.Jar)
+	if (app.Jar == "") && (app.EntryPoint != "") {
+		err = fmt.Errorf("app.entry_point(%s) must be used with app.jar(%s)", app.EntryPoint, app.Jar)
 		return
 	}
 
-	if this.Jar != "" { this.Jar = util.NormalizePath(this.Jar, this.Home) }
+	result = &AppSetting{
+		Name: app.Name,
+		Home: app.Home,
+		Jar: app.Jar,
+		EntryPoint: app.EntryPoint,
+		Command: app.Command,
+		PidFile: app.PidFile,
+	}
 
-	if this.Command != "" { this.Command = util.NormalizePath(this.Command, this.Home) }
+	// normalize paths
+	if result.Jar != "" { result.Jar = util.NormalizePath(result.Jar, result.Home) }
 
-	if this.PidFile != "" { this.PidFile = util.NormalizePath(this.PidFile, this.Home) }
+	if result.Command != "" { result.Command = util.NormalizePath(result.Command, result.Home) }
+
+	if result.PidFile != "" { result.PidFile = util.NormalizePath(result.PidFile, result.Home) }
 
 	return
 }
 
-func (this App) IsDuplicateAllowed() bool {
+func (this AppSetting) IsDuplicateAllowed() bool {
 	return this.PidFile != ""
 }
 
-func (this App) GetArgs(javaArgs []string) []string {
+func (this AppSetting) GetArgs(javaArgs []string) []string {
 	if this.Jar != "" {
 		if this.EntryPoint != "" {
 			return append(javaArgs, "-cp", this.Jar, this.EntryPoint)

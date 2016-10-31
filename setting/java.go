@@ -3,79 +3,142 @@ package setting
 import (
 	"fmt"
 	"path/filepath"
+	"sort"
 
+	"github.com/ocadaruma/go-javactl/setting/mapping"
 	"github.com/ocadaruma/go-javactl/util"
 )
 
-type Java struct {
+type JavaSetting struct {
 	Home string
 	Version float32
 	Server bool
-	Memory *Memory
-	JMX *JMX
+	Memory *MemorySetting
+	JMX *JMXSetting
 	Env map[string]string
 	Option []string
 }
 
-func (this Java) Normalize() (err error) {
-	if this.Home == "" || !filepath.IsAbs(this.Home) {
-		err = fmt.Errorf("java.home(%s) is required and must be an absolute path", this.Home)
+func NewJavaSetting(java mapping.Java) (result *JavaSetting, err error) {
+	if java.Home == "" || !filepath.IsAbs(java.Home) {
+		err = fmt.Errorf("java.home(%s) is required and must be an absolute path", java.Home)
 		return
 	}
 
-	if this.Version < 1 {
-		err = fmt.Errorf("invalid java.version(%f)", this.Version)
+	if java.Version < 1 {
+		err = fmt.Errorf("invalid java.version(%f)", java.Version)
 		return
 	}
 
-	err = this.Memory.validate(this.Version)
+	var memory *MemorySetting
+	if java.Memory != nil {
+		memory, err = newMemorySetting(java.Version, *java.Memory)
+		if err != nil { return }
+	}
+
+	var jmxSetting *JMXSetting
+	if java.JMX != nil {
+		jmx := newJMXSetting(*java.JMX)
+		jmxSetting = &jmx
+	}
+
+	result = &JavaSetting{
+		Home: java.Home,
+		Version: java.Version,
+		Server: java.Server,
+		Memory: memory,
+		JMX: jmxSetting,
+		Env: java.Env,
+		Option: java.Option,
+	}
 
 	return
 }
 
-func (this Java) getOpts() []string {
-
+func (this JavaSetting) GetArgs() []string {
+	return append([]string{this.getExecutable()}, this.getOpts()...)
 }
 
-func (this Java) GetExecutable() string {
+func (this JavaSetting) getExecutable() string {
 	return filepath.Join(this.Home, "bin", "java")
 }
 
-type Memory struct {
-	HeapMin string `yaml:"heap_min"`
-	HeapMax string `yaml:"heap_max"`
-	PermMin string `yaml:"perm_min"`
-	PermMax string `yaml:"perm_max"`
-	MetaspaceMin string `yaml:"metaspace_min"`
-	MetaspaceMax string `yaml:"metaspace_max"`
-	NewMin string `yaml:"new_min"`
-	NewMax string `yaml:"new_max"`
-	SurvivorRatio int `yaml:"survivor_ratio"`
-	TargetSurvivorRatio int `yaml:"target_survivor_ratio"`
+func (this JavaSetting) getOpts() (result []string) {
+	var memoryOpts []string
+	if this.Memory != nil { memoryOpts = this.Memory.getOpts() }
+
+	var jmxOpts []string
+	if this.JMX != nil { jmxOpts = this.JMX.getOpts() }
+
+	var server []string
+	if this.Server { server = []string{"-server"} }
+
+	var keys []string
+	for k := range this.Env { keys = append(keys, k) }
+	sort.Strings(keys)
+
+	var env []string
+	for _, k := range keys {
+		env = append(env, fmt.Sprintf("-D%s=%s", k, this.Env[k]))
+	}
+
+	result = append(result, server...)
+	result = append(result, memoryOpts...)
+	result = append(result, jmxOpts...)
+	result = append(result, env...)
+	result = append(result, this.Option...)
+
+	return
 }
 
-func (this Memory) validate(javaVersion float32) (err error) {
-	if this.PermMin != "" && javaVersion >= 1.8 {
+type MemorySetting struct {
+	HeapMin string
+	HeapMax string
+	PermMin string
+	PermMax string
+	MetaspaceMin string
+	MetaspaceMax string
+	NewMin string
+	NewMax string
+	SurvivorRatio *int
+	TargetSurvivorRatio *int
+}
+
+func newMemorySetting(javaVersion float32, memory mapping.Memory) (result *MemorySetting, err error) {
+	if memory.PermMin != "" && javaVersion >= 1.8 {
 		err = fmt.Errorf("java.memory.perm_min is not applicable to java(%v) >= 1.8", javaVersion)
 		return
 	}
-	if this.PermMax != "" && javaVersion >= 1.8 {
+	if memory.PermMax != "" && javaVersion >= 1.8 {
 		err = fmt.Errorf("java.memory.perm_max is not applicable to java(%v) >= 1.8", javaVersion)
 		return
 	}
-	if this.MetaspaceMin != "" && javaVersion < 1.8 {
+	if memory.MetaspaceMin != "" && javaVersion < 1.8 {
 		err = fmt.Errorf("java.memory.metaspace_min is not applicable to java(%v) < 1.8", javaVersion)
 		return
 	}
-	if this.MetaspaceMax != "" && javaVersion < 1.8 {
+	if memory.MetaspaceMax != "" && javaVersion < 1.8 {
 		err = fmt.Errorf("java.memory.metaspace_max is not applicable to java(%v) < 1.8", javaVersion)
 		return
 	}
 
+	result = &MemorySetting{
+		HeapMin: memory.HeapMin,
+		HeapMax: memory.HeapMax,
+		PermMin: memory.PermMin,
+		PermMax: memory.PermMax,
+		MetaspaceMin: memory.MetaspaceMin,
+		MetaspaceMax: memory.MetaspaceMax,
+		NewMin: memory.NewMin,
+		NewMax: memory.NewMax,
+		SurvivorRatio: memory.SurvivorRatio,
+		TargetSurvivorRatio: memory.TargetSurvivorRatio,
+	}
+
 	return
 }
 
-func (this Memory) getOpts() (result []string) {
+func (this MemorySetting) getOpts() (result []string) {
 	opts := []string{
 		util.EmptyIfZero("-Xms%s", this.HeapMin),
 		util.EmptyIfZero("-Xmx%s", this.HeapMax),
@@ -85,8 +148,8 @@ func (this Memory) getOpts() (result []string) {
 		util.EmptyIfZero("-XX:MaxMetaspaceSize=%s", this.MetaspaceMax),
 		util.EmptyIfZero("-Xmn%s", this.NewMin),
 		util.EmptyIfZero("-XX:MaxNewSize=%s", this.NewMax),
-		util.EmptyIfZero("-XX:SurvivorRatio=%d", this.SurvivorRatio),
-		util.EmptyIfZero("-XX:TargetSurvivorRatio=%d", this.TargetSurvivorRatio),
+		util.EmptyIfNilInt("-XX:SurvivorRatio=%d", this.SurvivorRatio),
+		util.EmptyIfNilInt("-XX:TargetSurvivorRatio=%d", this.TargetSurvivorRatio),
 	}
 
 	for _, o := range opts {
@@ -96,13 +159,21 @@ func (this Memory) getOpts() (result []string) {
 	return
 }
 
-type JMX struct {
+type JMXSetting struct {
 	Port *int
 	SSL *bool
 	Authenticate *bool
 }
 
-func (this JMX) getOpts() (result []string) {
+func newJMXSetting(jmx mapping.JMX) JMXSetting {
+	return JMXSetting{
+		Port: jmx.Port,
+		SSL: jmx.SSL,
+		Authenticate: jmx.Authenticate,
+	}
+}
+
+func (this JMXSetting) getOpts() (result []string) {
 	if this.Port != nil {
 		result = append(result,
 			"-Dcom.sun.management.jmxremote",

@@ -4,23 +4,38 @@ import (
 	"reflect"
 	"testing"
 	"time"
+
+	"github.com/ocadaruma/go-javactl/setting/mapping"
 )
 
 func TestSetting_GetArgs(t *testing.T) {
-	s, err := LoadConfig("../testdata/example.yml")
+	var err error
+	var config *mapping.YAMLConfig
+	config, err = mapping.LoadConfig("../testdata/example.yml")
 
 	if err != nil {
 		t.Errorf("load must not failed. err : %v", err)
 	}
 
-	args := s.GetArgs(time.Date(2015, 9, 10, 12, 34, 56, 789, time.Local))
+	var s *Setting
+	s, err = NewSetting(*config)
+
+	if err != nil {
+		t.Errorf("setting instantiatiation must not failed. err : %v", err)
+	}
+
+	args := s.GetArgs([]string{
+		"--foo", "bar",
+	}, time.Date(2015, 9, 10, 12, 34, 56, 789, time.Local))
 
 	testCases0 := []struct{
 		expect, actual string
 	} {
 		{args[0], "/usr/java/latest/bin/java"},
-		{args[len(args)-2], "-jar"},
-		{args[len(args)-1], "/path/to/your-app/bin/your-app-assembly-0.1.0.jar"},
+		{args[len(args)-4], "-jar"},
+		{args[len(args)-3], "/path/to/your-app/bin/your-app-assembly-0.1.0.jar"},
+		{args[len(args)-2], "--foo"},
+		{args[len(args)-1], "bar"},
 	}
 
 	for i, c := range testCases0 {
@@ -33,7 +48,7 @@ func TestSetting_GetArgs(t *testing.T) {
 	otherArgsActual := make(map[string]struct{})
 
 
-	for _, arg := range args[1:len(args)-2] {
+	for _, arg := range args[1:len(args)-4] {
 		otherArgsActual[arg] = struct{}{}
 	}
 

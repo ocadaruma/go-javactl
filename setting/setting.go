@@ -1,53 +1,52 @@
 package setting
 
 import (
-	"io/ioutil"
 	"time"
 
-	"github.com/go-yaml/yaml"
+	"github.com/ocadaruma/go-javactl/setting/mapping"
 )
 
 type Setting struct {
-	App App
-	Java Java
-	Log *Log
-	OS OS
-	PreCommands  []string `yaml:"pre"`
-	PostCommands []string `yaml:"post"`
+	App AppSetting
+	Java JavaSetting
+	Log *LogSetting
+	OS OSSetting
+	PreCommands  []string
+	PostCommands []string
 }
 
-func LoadConfig(configPath string) (result *Setting, err error) {
-	result, err = load(configPath)
-
+func NewSetting(config mapping.YAMLConfig) (result *Setting, err error) {
+	var app *AppSetting
+	app, err = NewAppSetting(config.App)
 	if err != nil { return }
 
-	err = result.App.Normalize()
+	var java *JavaSetting
+	java, err = NewJavaSetting(config.Java)
 	if err != nil { return }
 
-	err = result.Java.Normalize()
+	var logSetting *LogSetting
+	if config.Log != nil {
+		log := NewLogSetting(app.Home, *config.Log)
+		logSetting = &log
+	}
+
+	os := NewOSSetting(config.OS)
+
+	result = &Setting{
+		App: *app,
+		Java: *java,
+		Log: logSetting,
+		OS: os,
+		PreCommands: config.PreCommands,
+		PostCommands: config.PostCommands,
+	}
 
 	return
 }
 
-func (this Setting) GetArgs(now time.Time) []string {
-	result := []string{}
-
-	logArgs := []string{}
-	if this.Log != nil { logArgs = this.Log.GetOpts() }
-
-	this.App.GetArgs()
-
-	return result
-}
-
-func load(configPath string) (result *Setting, err error) {
-	var buf []byte
-	buf, err = ioutil.ReadFile(configPath)
-
-	if err != nil { return }
-
-	result = &Setting{}
-	err = yaml.Unmarshal(buf, result)
-
-	return
+func (this Setting) GetArgs(extraArgs []string, now time.Time) []string {
+	return append(
+		this.App.GetArgs(append(this.Java.GetArgs(), this.Log.GetOpts(now)...)),
+		extraArgs...
+	)
 }
