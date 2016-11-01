@@ -62,12 +62,12 @@ func TestEmptyIfZero(t *testing.T) {
 	testCases := []struct {
 		actual, expect string
 	} {
-		{EmptyIfZero("foo:%s", ""), ""},
-		{EmptyIfZero("foo:%s", "bar"), "foo:bar"},
-		{EmptyIfZero("foo:%d", 0), ""},
-		{EmptyIfZero("foo:%d", 1), "foo:1"},
-		{EmptyIfZero("foo:%d", -1), "foo:-1"},
-		{EmptyIfZero("foo:%v", (*string)(nil)), ""},
+		{FmtIfNonZero("foo:%s", ""), ""},
+		{FmtIfNonZero("foo:%s", "bar"), "foo:bar"},
+		{FmtIfNonZero("foo:%d", 0), ""},
+		{FmtIfNonZero("foo:%d", 1), "foo:1"},
+		{FmtIfNonZero("foo:%d", -1), "foo:-1"},
+		{FmtIfNonZero("foo:%v", (*string)(nil)), ""},
 	}
 
 	for i, c := range testCases {
@@ -84,8 +84,8 @@ func TestEmptyIfNil(t *testing.T) {
 	testCases := []struct {
 		actual, expect string
 	} {
-		{EmptyIfNilInt("foo:%d", (*int)(nil)), ""},
-		{EmptyIfNilInt("foo:%d", iPtr), "foo:42"},
+		{FmtIfNonNilInt("foo:%d", (*int)(nil)), ""},
+		{FmtIfNonNilInt("foo:%d", iPtr), "foo:42"},
 	}
 
 	for i, c := range testCases {

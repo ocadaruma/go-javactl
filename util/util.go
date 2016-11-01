@@ -65,14 +65,14 @@ func NormalizePath(path string, baseDir string) string {
 	}
 }
 
-func EmptyIfZero(format string, value interface{}) (result string) {
+func FmtIfNonZero(format string, value interface{}) (result string) {
 	if value != reflect.Zero(reflect.TypeOf(value)).Interface() {
 		result = fmt.Sprintf(format, value)
 	}
 	return
 }
 
-func EmptyIfNilInt(format string, value *int) (result string) {
+func FmtIfNonNilInt(format string, value *int) (result string) {
 	if value != nil {
 		result = fmt.Sprintf(format, *value)
 	}

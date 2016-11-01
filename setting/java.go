@@ -140,16 +140,16 @@ func newMemorySetting(javaVersion float32, memory mapping.Memory) (result *Memor
 
 func (this MemorySetting) getOpts() (result []string) {
 	opts := []string{
-		util.EmptyIfZero("-Xms%s", this.HeapMin),
-		util.EmptyIfZero("-Xmx%s", this.HeapMax),
-		util.EmptyIfZero("-XX:PermSize=%s", this.PermMin),
-		util.EmptyIfZero("-XX:MaxPermSize=%s", this.PermMax),
-		util.EmptyIfZero("-XX:MetaspaceSize=%s", this.MetaspaceMin),
-		util.EmptyIfZero("-XX:MaxMetaspaceSize=%s", this.MetaspaceMax),
-		util.EmptyIfZero("-Xmn%s", this.NewMin),
-		util.EmptyIfZero("-XX:MaxNewSize=%s", this.NewMax),
-		util.EmptyIfNilInt("-XX:SurvivorRatio=%d", this.SurvivorRatio),
-		util.EmptyIfNilInt("-XX:TargetSurvivorRatio=%d", this.TargetSurvivorRatio),
+		util.FmtIfNonZero("-Xms%s", this.HeapMin),
+		util.FmtIfNonZero("-Xmx%s", this.HeapMax),
+		util.FmtIfNonZero("-XX:PermSize=%s", this.PermMin),
+		util.FmtIfNonZero("-XX:MaxPermSize=%s", this.PermMax),
+		util.FmtIfNonZero("-XX:MetaspaceSize=%s", this.MetaspaceMin),
+		util.FmtIfNonZero("-XX:MaxMetaspaceSize=%s", this.MetaspaceMax),
+		util.FmtIfNonZero("-Xmn%s", this.NewMin),
+		util.FmtIfNonZero("-XX:MaxNewSize=%s", this.NewMax),
+		util.FmtIfNonNilInt("-XX:SurvivorRatio=%d", this.SurvivorRatio),
+		util.FmtIfNonNilInt("-XX:TargetSurvivorRatio=%d", this.TargetSurvivorRatio),
 	}
 
 	for _, o := range opts {
