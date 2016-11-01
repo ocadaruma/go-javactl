@@ -1,18 +1,18 @@
 ---
 app:
   name: your-app
-  home: {{ tempdir }}
+  home: {{.tempdir}}
   jar: bin/your-app-assembly-0.1.0.jar
   pid_file: your-app.pid
 
 os:
-  user: {{ os_user }}
+  user: {{.os_user}}
   env:
     YOUR_APP_ENV_VAR1: 12345
     YOUR_APP_ENV_VAR2: /path/to/xxx
 
 java:
-  home: {{ curdir }}/tests/resources/mock/jdk8
+  home: {{.curdir}}/testdata/mock/jdk8
   version: 1.8
   server: true
   
