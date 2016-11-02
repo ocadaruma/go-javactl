@@ -2,13 +2,14 @@ package logger
 
 import (
 	"fmt"
+	"log/syslog"
 )
 
-type LogLevel int
+type LogLevel syslog.Priority
 const (
-	LOG_INFO LogLevel = 6
-	LOG_WARNING LogLevel = 4
-	LOG_ERR LogLevel = 3
+	LOG_INFO LogLevel = (LogLevel)(syslog.LOG_INFO)
+	LOG_WARNING LogLevel = (LogLevel)(syslog.LOG_WARNING)
+	LOG_ERR LogLevel = (LogLevel)(syslog.LOG_ERR)
 )
 
 var levelPrefix = map[LogLevel]string {
@@ -17,8 +18,21 @@ var levelPrefix = map[LogLevel]string {
 	LOG_ERR: "[ERROR]",
 }
 
-type Logger interface {
+func (this LogLevel) String() string {
+	return levelPrefix[this]
+}
+
+type LogStrategy interface {
 	Log(level LogLevel, message string)
+}
+
+type Logger struct {
+	strategy LogStrategy
+}
+
+func NewLogger(strategy LogStrategy) Logger {
+	l := Logger{ strategy: strategy }
+	return l
 }
 
 func (this Logger) Info(message string) {
@@ -38,5 +52,5 @@ func (this Logger) logMessage(level LogLevel, message string) {
 
 	msg := fmt.Sprintf("%s%s", prefix, message)
 
-	this.Log(level, msg)
+	this.strategy.Log(level, msg)
 }

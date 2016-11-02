@@ -15,7 +15,7 @@ type JavaSetting struct {
 	Server bool
 	Memory *MemorySetting
 	JMX *JMXSetting
-	Env map[string]string
+	Prop map[string]string
 	Option []string
 }
 
@@ -48,7 +48,7 @@ func NewJavaSetting(java mapping.Java) (result *JavaSetting, err error) {
 		Server: java.Server,
 		Memory: memory,
 		JMX: jmxSetting,
-		Env: java.Env,
+		Prop: java.Prop,
 		Option: java.Option,
 	}
 
@@ -74,18 +74,18 @@ func (this JavaSetting) getOpts() (result []string) {
 	if this.Server { server = []string{"-server"} }
 
 	var keys []string
-	for k := range this.Env { keys = append(keys, k) }
+	for k := range this.Prop { keys = append(keys, k) }
 	sort.Strings(keys)
 
-	var env []string
+	var prop []string
 	for _, k := range keys {
-		env = append(env, fmt.Sprintf("-D%s=%s", k, this.Env[k]))
+		prop = append(prop, fmt.Sprintf("-D%s=%s", k, this.Prop[k]))
 	}
 
 	result = append(result, server...)
 	result = append(result, memoryOpts...)
 	result = append(result, jmxOpts...)
-	result = append(result, env...)
+	result = append(result, prop...)
 	result = append(result, this.Option...)
 
 	return

@@ -44,7 +44,7 @@ type Java struct {
 	Server bool
 	Memory *Memory
 	JMX *JMX
-	Env map[string]string
+	Prop map[string]string
 	Option []string
 }
 
