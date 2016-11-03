@@ -94,3 +94,19 @@ func TestEmptyIfNil(t *testing.T) {
 		}
 	}
 }
+
+func TestList2Cmdline(t *testing.T) {
+	testCases := []struct {
+		actual, expect string
+	} {
+		{List2Cmdline([]string{"a", "b", "c"}), `a b c`},
+		{List2Cmdline([]string{"a b", "c"}), `"a b" c`},
+		//{List2Cmdline([]string{""}), "foo:42"},
+	}
+
+	for i, c := range testCases {
+		if c.actual != c.expect {
+			t.Errorf("case %v : %v must equal to %v", i, c.actual, c.expect)
+		}
+	}
+}

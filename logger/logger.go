@@ -30,9 +30,9 @@ type Logger struct {
 	strategy LogStrategy
 }
 
-func NewLogger(strategy LogStrategy) Logger {
+func NewLogger(strategy LogStrategy) *Logger {
 	l := Logger{ strategy: strategy }
-	return l
+	return &l
 }
 
 func (this Logger) Info(message string) {
@@ -51,6 +51,5 @@ func (this Logger) logMessage(level LogLevel, message string) {
 	prefix := levelPrefix[level]
 
 	msg := fmt.Sprintf("%s%s", prefix, message)
-
 	this.strategy.Log(level, msg)
 }

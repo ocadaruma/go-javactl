@@ -17,7 +17,7 @@ type AppSetting struct {
 	PidFile string
 }
 
-func NewAppSetting(app mapping.App) (result *AppSetting, err error) {
+func NewAppSetting(app *mapping.App) (result *AppSetting, err error) {
 	if !filepath.IsAbs(app.Home) {
 		err = fmt.Errorf("app.home(%s) must be an absolute path", app.Home)
 		return
@@ -52,11 +52,11 @@ func NewAppSetting(app mapping.App) (result *AppSetting, err error) {
 	return
 }
 
-func (this AppSetting) IsDuplicateAllowed() bool {
+func (this *AppSetting) IsDuplicateAllowed() bool {
 	return this.PidFile != ""
 }
 
-func (this AppSetting) GetArgs(javaArgs []string) []string {
+func (this *AppSetting) GetArgs(javaArgs []string) []string {
 	if this.Jar != "" {
 		if this.EntryPoint != "" {
 			return append(javaArgs, "-cp", this.Jar, this.EntryPoint)

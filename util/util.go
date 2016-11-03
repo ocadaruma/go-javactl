@@ -29,7 +29,7 @@ type MemSize struct {
 	Unit int64
 }
 
-func (this MemSize) Bytes() int64 {
+func (this *MemSize) Bytes() int64 {
 	return int64(this.Value) * this.Unit
 }
 
@@ -75,6 +75,27 @@ func FmtIfNonZero(format string, value interface{}) (result string) {
 func FmtIfNonNilInt(format string, value *int) (result string) {
 	if value != nil {
 		result = fmt.Sprintf(format, *value)
+	}
+	return
+}
+
+func List2Cmdline(seq []string) (result string) {
+	buf := []string{}
+	for _, str := range seq {
+		buf = append(buf, quote(str))
+	}
+
+	result = strings.Join(buf, " ")
+	return
+}
+
+func quote(str string) (result string) {
+	match, _ := regexp.MatchString(`\s`, str)
+
+	if match {
+		result = fmt.Sprintf(`"%s"`, str)
+	} else {
+		result = str
 	}
 	return
 }

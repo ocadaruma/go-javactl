@@ -19,7 +19,7 @@ type JavaSetting struct {
 	Option []string
 }
 
-func NewJavaSetting(java mapping.Java) (result *JavaSetting, err error) {
+func NewJavaSetting(java *mapping.Java) (result *JavaSetting, err error) {
 	if java.Home == "" || !filepath.IsAbs(java.Home) {
 		err = fmt.Errorf("java.home(%s) is required and must be an absolute path", java.Home)
 		return
@@ -32,13 +32,13 @@ func NewJavaSetting(java mapping.Java) (result *JavaSetting, err error) {
 
 	var memory *MemorySetting
 	if java.Memory != nil {
-		memory, err = newMemorySetting(java.Version, *java.Memory)
+		memory, err = newMemorySetting(java.Version, java.Memory)
 		if err != nil { return }
 	}
 
 	var jmxSetting *JMXSetting
 	if java.JMX != nil {
-		jmx := newJMXSetting(*java.JMX)
+		jmx := newJMXSetting(java.JMX)
 		jmxSetting = &jmx
 	}
 
@@ -55,15 +55,15 @@ func NewJavaSetting(java mapping.Java) (result *JavaSetting, err error) {
 	return
 }
 
-func (this JavaSetting) GetArgs() []string {
+func (this *JavaSetting) GetArgs() []string {
 	return append([]string{this.GetExecutable()}, this.getOpts()...)
 }
 
-func (this JavaSetting) GetExecutable() string {
+func (this *JavaSetting) GetExecutable() string {
 	return filepath.Join(this.Home, "bin", "java")
 }
 
-func (this JavaSetting) getOpts() (result []string) {
+func (this *JavaSetting) getOpts() (result []string) {
 	var memoryOpts []string
 	if this.Memory != nil { memoryOpts = this.Memory.getOpts() }
 
@@ -104,7 +104,7 @@ type MemorySetting struct {
 	TargetSurvivorRatio *int
 }
 
-func newMemorySetting(javaVersion float32, memory mapping.Memory) (result *MemorySetting, err error) {
+func newMemorySetting(javaVersion float32, memory *mapping.Memory) (result *MemorySetting, err error) {
 	if memory.PermMin != "" && javaVersion >= 1.8 {
 		err = fmt.Errorf("java.memory.perm_min is not applicable to java(%v) >= 1.8", javaVersion)
 		return
@@ -138,7 +138,7 @@ func newMemorySetting(javaVersion float32, memory mapping.Memory) (result *Memor
 	return
 }
 
-func (this MemorySetting) getOpts() (result []string) {
+func (this *MemorySetting) getOpts() (result []string) {
 	opts := []string{
 		util.FmtIfNonZero("-Xms%s", this.HeapMin),
 		util.FmtIfNonZero("-Xmx%s", this.HeapMax),
@@ -165,7 +165,7 @@ type JMXSetting struct {
 	Authenticate *bool
 }
 
-func newJMXSetting(jmx mapping.JMX) JMXSetting {
+func newJMXSetting(jmx *mapping.JMX) JMXSetting {
 	return JMXSetting{
 		Port: jmx.Port,
 		SSL: jmx.SSL,
@@ -173,7 +173,7 @@ func newJMXSetting(jmx mapping.JMX) JMXSetting {
 	}
 }
 
-func (this JMXSetting) getOpts() (result []string) {
+func (this *JMXSetting) getOpts() (result []string) {
 	if this.Port != nil {
 		result = append(result,
 			"-Dcom.sun.management.jmxremote",

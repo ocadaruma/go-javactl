@@ -15,28 +15,28 @@ type LogSetting struct {
 	ErrorLog *ErrorLogSetting
 }
 
-func NewLogSetting(home string, log mapping.Log) (result LogSetting) {
+func NewLogSetting(home string, log *mapping.Log) (result LogSetting) {
 	if log.ConsoleLog != nil {
-		console := newConsoleLogSetting(home, *log.ConsoleLog)
+		console := newConsoleLogSetting(home, log.ConsoleLog)
 		result.ConsoleLog = &console
 	}
 	if log.GCLog != nil {
-		gc := newGCLogSetting(home, *log.GCLog)
+		gc := newGCLogSetting(home, log.GCLog)
 		result.GCLog = &gc
 	}
 	if log.Dump != nil {
-		dump := newDumpSetting(home, *log.Dump)
+		dump := newDumpSetting(home, log.Dump)
 		result.Dump = &dump
 	}
 	if log.ErrorLog != nil {
-		errorLog := newErrorLogSetting(home, *log.ErrorLog)
+		errorLog := newErrorLogSetting(home, log.ErrorLog)
 		result.ErrorLog = &errorLog
 	}
 
 	return
 }
 
-func (this LogSetting) GetOpts(now time.Time) (result []string) {
+func (this *LogSetting) GetOpts(now time.Time) (result []string) {
 	if this.GCLog != nil {
 		result = append(result, this.GCLog.getOpts(now)...)
 	}
@@ -57,7 +57,7 @@ type ConsoleLogSetting struct {
 	Preserve int
 }
 
-func newConsoleLogSetting(home string, consoleLog mapping.ConsoleLog) (result ConsoleLogSetting) {
+func newConsoleLogSetting(home string, consoleLog *mapping.ConsoleLog) (result ConsoleLogSetting) {
 	result = ConsoleLogSetting{
 		Prefix: consoleLog.Prefix,
 		MaxSize: nil,
@@ -76,7 +76,7 @@ func newConsoleLogSetting(home string, consoleLog mapping.ConsoleLog) (result Co
 	return
 }
 
-func (this ConsoleLogSetting) GetPath(now time.Time) (result string) {
+func (this *ConsoleLogSetting) GetPath(now time.Time) (result string) {
 	if this.Prefix != "" {
 		result = getPath(this.Prefix, now)
 	}
@@ -90,14 +90,14 @@ type GCLogSetting struct {
 	Preserve int
 }
 
-func (this GCLogSetting) GetPath(now time.Time) (result string) {
+func (this *GCLogSetting) GetPath(now time.Time) (result string) {
 	if this.Prefix != "" {
 		result = getPath(this.Prefix, now)
 	}
 	return
 }
 
-func (this GCLogSetting) getOpts(now time.Time) (result []string) {
+func (this *GCLogSetting) getOpts(now time.Time) (result []string) {
 	if this.Prefix != "" {
 		result = append(result, []string{
 			"-verbose:gc",
@@ -120,7 +120,7 @@ func (this GCLogSetting) getOpts(now time.Time) (result []string) {
 	return
 }
 
-func newGCLogSetting(home string, gcLog mapping.GCLog) (result GCLogSetting) {
+func newGCLogSetting(home string, gcLog *mapping.GCLog) (result GCLogSetting) {
 	result = GCLogSetting{
 		Prefix: gcLog.Prefix,
 		MaxSize: gcLog.MaxSize,
@@ -137,7 +137,7 @@ type DumpSetting struct {
 	Prefix string
 }
 
-func newDumpSetting(home string, dump mapping.Dump) (result DumpSetting) {
+func newDumpSetting(home string, dump *mapping.Dump) (result DumpSetting) {
 	result = DumpSetting{
 		Prefix: dump.Prefix,
 	}
@@ -145,7 +145,7 @@ func newDumpSetting(home string, dump mapping.Dump) (result DumpSetting) {
 	return
 }
 
-func (this DumpSetting) getOpts() (result []string) {
+func (this *DumpSetting) getOpts() (result []string) {
 	if this.Prefix != "" {
 		result = append(result,
 			"-XX:+HeapDumpOnOutOfMemoryError",
@@ -159,7 +159,7 @@ type ErrorLogSetting struct {
 	Path string
 }
 
-func newErrorLogSetting(home string, errorLog mapping.ErrorLog) (result ErrorLogSetting) {
+func newErrorLogSetting(home string, errorLog *mapping.ErrorLog) (result ErrorLogSetting) {
 	result = ErrorLogSetting{
 		Path: errorLog.Path,
 	}
@@ -167,7 +167,7 @@ func newErrorLogSetting(home string, errorLog mapping.ErrorLog) (result ErrorLog
 	return
 }
 
-func (this ErrorLogSetting) getOpts() []string {
+func (this *ErrorLogSetting) getOpts() []string {
 	if this.Path != "" {
 		return []string{fmt.Sprintf("-XX:ErrorFile=%s", this.Path)}
 	} else {

@@ -13,7 +13,7 @@ func (this systemLoggerStrategy) Log(level LogLevel, message string) {
 	if this.DryRun {
 		fmt.Printf("Would write to syslog: priority=%s, message=%s", level, message)
 	} else {
-		writer, err := syslog.New(level, "")
+		writer, err := syslog.New(syslog.Priority(level), "")
 		if err != nil { return }
 
 		writer.Write([]byte(message))
@@ -21,6 +21,6 @@ func (this systemLoggerStrategy) Log(level LogLevel, message string) {
 	}
 }
 
-func NewSystemLogger(dryRun bool) Logger {
+func NewSystemLogger(dryRun bool) *Logger {
 	return NewLogger(systemLoggerStrategy{DryRun: dryRun})
 }

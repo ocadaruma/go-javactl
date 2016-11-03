@@ -9,7 +9,7 @@ type OSSetting struct {
 	Env map[string]string
 }
 
-func NewOSSetting(os mapping.OS) OSSetting {
+func NewOSSetting(os *mapping.OS) OSSetting {
 	return OSSetting{
 		User: os.User,
 		Env: os.Env,

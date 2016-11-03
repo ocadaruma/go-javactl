@@ -19,7 +19,7 @@ func TestSetting(t *testing.T) {
 	}
 
 	var s *Setting
-	s, err = NewSetting(*config)
+	s, err = NewSetting(config)
 
 	if err != nil {
 		t.Errorf("setting instantiatiation must not failed. err : %v", err)
