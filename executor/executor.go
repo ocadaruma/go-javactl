@@ -40,9 +40,6 @@ func (this *Executor) CheckRequirement() (err error) {
 	if err != nil { return }
 
 	err = this.checkJavaVersion()
-	if err != nil { return }
-
-	err = this.checkDuplicateProcess()
 
 	return
 }
@@ -62,17 +59,17 @@ func (this *Executor) checkJavaVersion() (err error) {
 	out, err = exec.Command(this.Setting.Java.GetExecutable(), "-version").CombinedOutput()
 	if err != nil { return }
 
-	actual := regexp.MustCompile(`java version "(\d+[.]\d+)[.]\d+_\d+"`).FindStringSubmatch(string(out))[0]
 	versionString := fmt.Sprintf("%.1f", this.Setting.Java.Version)
+	matches := regexp.MustCompile(`java version "(\d+[.]\d+)[.]\d+_\d+"`).FindStringSubmatch(string(out))
 
-	if versionString != actual {
-		err = fmt.Errorf("Unexpected Java version: expect='%s', actual='%s'.", versionString, actual)
+	if matches == nil || len(matches) < 2 || versionString != matches[1] {
+		err = fmt.Errorf("Unexpected Java version: expect='%s', actual='%s'.", versionString, matches[1])
 	}
 
 	return
 }
 
-func (this *Executor) checkDuplicateProcess() (err error) {
+func (this *Executor) CheckDuplicateProcess() (err error) {
 	if !this.Setting.App.IsDuplicateAllowed() {
 		// check pid file existence
 		_, e := os.Stat(this.Setting.App.PidFile)
@@ -126,9 +123,12 @@ func (this *Executor) CreateDirectories() (err error) {
 			if this.Opts.DryRun {
 				fmt.Printf("Would create directory: %s\n", dir)
 			} else {
-				fmt.Printf("Creating directory: %s\n", dir)
-				err = os.MkdirAll(dir, os.ModeDir)
-				if err != nil { return }
+				_, statErr := os.Stat(dir)
+				if statErr != nil {
+					fmt.Printf("Creating directory: %s\n", dir)
+					err = os.MkdirAll(dir, 0777)
+					if err != nil { return }
+				}
 			}
 		}
 	}
