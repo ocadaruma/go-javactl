@@ -50,6 +50,6 @@ func (this Logger) Error(message string) {
 func (this Logger) logMessage(level LogLevel, message string) {
 	prefix := levelPrefix[level]
 
-	msg := fmt.Sprintf("%s%s", prefix, message)
+	msg := fmt.Sprintf("%s %s", prefix, message)
 	this.strategy.Log(level, msg)
 }

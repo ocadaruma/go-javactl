@@ -1,7 +1,9 @@
 package logger
 
 import (
+	"fmt"
 	"io"
+	"time"
 
 	"github.com/natefinch/lumberjack"
 )
@@ -27,7 +29,9 @@ type consoleStrategy struct {
 }
 
 func (this *consoleStrategy) Log(level LogLevel, message string) {
-	n, err := this.underlying.Write([]byte(message))
+	formatted := fmt.Sprintf("[%s] %s", time.Now().Format("2006-01-02 15-04-05,000"), message)
+
+	n, err := this.underlying.Write([]byte(formatted))
 	this.writeCallback(n, err)
 }
 

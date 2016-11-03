@@ -35,7 +35,7 @@ func TestJavactl(t *testing.T) {
 
 	var b bytes.Buffer
 	user, _ := user.Current()
-	tmpl.Execute(&b, map[string]string{"tempdir":tempDir, "curdir":curdir, "os_user":user.Username})
+	tmpl.Execute(&b, map[string]string{"tempdir": tempDir, "curdir": curdir, "os_user": user.Username})
 
 	ioutil.WriteFile(confFile, b.Bytes(), 0644)
 
@@ -51,6 +51,7 @@ func TestJavactl(t *testing.T) {
 	os.Stdout = wStdout
 	os.Stderr = wStderr
 
+	os.Args = []string{"javactl", confFile}
 	main()
 
 	os.Stdout = origStdout
@@ -110,7 +111,7 @@ func TestJavactl(t *testing.T) {
 		" -server -Xms64M -Xmx2G -XX:MetaspaceSize=1G -XX:MaxMetaspaceSize=2G -Xmn256M -XX:MaxNewSize=256M ",
 		"-XX:SurvivorRatio=8 -XX:TargetSurvivorRatio=50 -Dcom.sun.management.jmxremote ",
 		"-Dcom.sun.management.jmxremote.port=20001 -Dcom.sun.management.jmxremote.ssl=false ",
-		"-Dcom.sun.management.jmxremote.authenticate=false -Dcom.amazonaws.sdk.disableCertChecking=True ",
+		"-Dcom.sun.management.jmxremote.authenticate=false -Dcom.amazonaws.sdk.disableCertChecking=true ",
 		"-Dfile.encoding=UTF-8 -Dhttp.netty.maxInitialLineLength=8192 -Dhttp.port=9000 ",
 		"-XX:+UseConcMarkSweepGC -XX:+CMSParallelRemarkEnabled -XX:+UseCMSInitiatingOccupancyOnly ",
 		"-XX:CMSInitiatingOccupancyFraction=70 -XX:+ScavengeBeforeFullGC -XX:+CMSScavengeBeforeRemark ",
@@ -122,13 +123,13 @@ func TestJavactl(t *testing.T) {
 		"-XX:+HeapDumpOnOutOfMemoryError ",
 		fmt.Sprintf("-XX:HeapDumpPath=%s ", logDirs[2]),
 		fmt.Sprintf("-XX:ErrorFile=%s/hs_error_pid%%p.log ", logDir),
-		fmt.Sprintf("-jar %s/bin/your-app-assembly-0.1.0.jar\n", tempDir),
+		fmt.Sprintf("-jar %s/bin/your-app-assembly-0.1.0.jar", tempDir),
 	}, "")
 
-	if logContent[25:709 + logDirLen] != expected1 {
-		t.Errorf("log content(%s) must equal to (%s)", logContent[25:709 + logDirLen], expected1)
+	if logContent[25:709+logDirLen] != expected1 {
+		t.Errorf("log content(%s) must equal to (%s)", logContent[25:709+logDirLen], expected1)
 	}
-	if logContent[728 + logDirLen:] != expected2 {
-		t.Errorf("log content(%s) must equal to (%s)", logContent[728 + logDirLen:], expected2)
+	if logContent[728+logDirLen:] != expected2 {
+		t.Errorf("log content(%s) must equal to (%s)", logContent[728+logDirLen:], expected2)
 	}
 }

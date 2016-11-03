@@ -1,6 +1,7 @@
 package executor
 
 import (
+	"bufio"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -357,8 +358,36 @@ func callSubprocess(args *subprocessArgs) (err error) {
 	}
 	if len(envPairs) > 0 { cmd.Env = envPairs }
 
-	if args.stdout == nil { cmd.Stdout = os.Stdout } else { cmd.Stdout = args.stdout }
-	if args.stderr == nil { cmd.Stderr = os.Stderr } else { cmd.Stderr = args.stderr }
+	if args.stdout == nil {
+		cmd.Stdout = os.Stdout
+	} else {
+		var reader io.ReadCloser
+		reader, err = cmd.StdoutPipe()
+		if err != nil { return }
+
+		go func() {
+			scanner := bufio.NewScanner(reader)
+			for scanner.Scan() { args.stdout.Write(scanner.Bytes()) }
+			reader.Close()
+		}()
+		//cmd.Stdout = args.stdout
+	}
+
+	if args.stderr == nil {
+		cmd.Stderr = os.Stderr
+	} else {
+		var reader io.ReadCloser
+		reader, err = cmd.StderrPipe()
+		if err != nil { return }
+
+		go func() {
+			scanner := bufio.NewScanner(reader)
+			for scanner.Scan() { args.stderr.Write(scanner.Bytes()) }
+			reader.Close()
+		}()
+		//cmd.Stderr = args.stderr
+	}
+
 	if args.stdin != nil { cmd.Stdin = args.stdin }
 
 	if args.pidFile == "" {
