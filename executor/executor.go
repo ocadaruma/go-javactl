@@ -127,7 +127,7 @@ func (this *Executor) CreateDirectories() (err error) {
 				_, statErr := os.Stat(dir)
 				if statErr != nil {
 					fmt.Printf("Creating directory: %s\n", dir)
-					err = os.MkdirAll(dir, 0777)
+					err = os.MkdirAll(dir, 0744)
 					if err != nil { return }
 				}
 			}

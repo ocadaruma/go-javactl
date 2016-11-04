@@ -9,7 +9,7 @@ type systemLoggerStrategy struct {
 	DryRun bool
 }
 
-func (this systemLoggerStrategy) Log(level LogLevel, message string) {
+func (this *systemLoggerStrategy) Log(level LogLevel, message string) {
 	if this.DryRun {
 		fmt.Printf("Would write to syslog: priority=%s, message=%s", level, message)
 	} else {
@@ -22,5 +22,5 @@ func (this systemLoggerStrategy) Log(level LogLevel, message string) {
 }
 
 func NewSystemLogger(dryRun bool) *Logger {
-	return NewLogger(systemLoggerStrategy{DryRun: dryRun})
+	return NewLogger(&systemLoggerStrategy{DryRun: dryRun})
 }
