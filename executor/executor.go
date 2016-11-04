@@ -275,11 +275,11 @@ func (this *Executor) executeApplication(now time.Time) (err error) {
 
 	if err != nil {
 		this.Logger.Error(
-			fmt.Sprintf("%s ended with error: error=%v, elapsed=%ds",
+			fmt.Sprintf("%s ended with error: error=%v, elapsed=%fs",
 				this.Setting.App.Name, err, elapsed.Seconds()))
 	} else {
 		this.Logger.Info(
-			fmt.Sprintf("%s ended successfully: elapsed=%ds",
+			fmt.Sprintf("%s ended successfully: elapsed=%fs",
 				this.Setting.App.Name, elapsed.Seconds()))
 	}
 
