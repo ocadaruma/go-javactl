@@ -142,14 +142,14 @@ func (this *Executor) CleanOldLogs(now time.Time) (err error) {
 		// clear console logs
 		if console := log.ConsoleLog; console != nil {
 			if console.Prefix != "" && console.Preserve > 0 {
-				err = this.deleteFiles(console.Prefix)
+				err = this.deleteFiles(console.Prefix, now, console.Preserve)
 				if err != nil { return }
 			}
 		}
 		// clear gc logs
 		if gc := log.GCLog; gc != nil {
 			if gc.Prefix != "" && gc.Preserve > 0 {
-				err = this.deleteFiles(gc.Prefix)
+				err = this.deleteFiles(gc.Prefix, now, gc.Preserve)
 				if err != nil { return }
 			}
 		}
@@ -157,19 +157,26 @@ func (this *Executor) CleanOldLogs(now time.Time) (err error) {
 	return
 }
 
-func (this *Executor) deleteFiles(prefix string) (err error) {
+func (this *Executor) deleteFiles(prefix string, now time.Time, preserve int) (err error) {
 	var files []string
 	files, err = filepath.Glob(prefix + "*")
 
 	if err != nil { return }
 
 	for _, path := range files {
-		if this.Opts.DryRun {
-			fmt.Printf("Would delete file: %s\n", path)
-		} else {
-			fmt.Printf("Deleting file: %s\n", path)
-			err = os.Remove(path)
-			if err != nil { return }
+		var fileinfo os.FileInfo
+		fileinfo, err = os.Stat(path)
+		if err != nil { return }
+
+		mtime := fileinfo.ModTime()
+		if mtime.Before(now.Add(-time.Duration(preserve) * 24 * time.Hour)) {
+			if this.Opts.DryRun {
+				fmt.Printf("Would delete file: %s\n", path)
+			} else {
+				fmt.Printf("Deleting file: %s\n", path)
+				err = os.Remove(path)
+				if err != nil { return }
+			}
 		}
 	}
 
@@ -238,6 +245,7 @@ func (this *Executor) executeApplication(now time.Time) (err error) {
 				maxBytes = this.Setting.Log.ConsoleLog.MaxSize.Bytes()
 			}
 			out := logger.NewConsoleLogger(outpath, maxBytes, this.Setting.Log.ConsoleLog.Backup)
+			defer out.Close()
 			stdout = out
 			stderr = out
 		} else {
@@ -370,7 +378,6 @@ func callSubprocess(args *subprocessArgs) (err error) {
 			for scanner.Scan() { args.stdout.Write(scanner.Bytes()) }
 			reader.Close()
 		}()
-		//cmd.Stdout = args.stdout
 	}
 
 	if args.stderr == nil {
@@ -385,7 +392,6 @@ func callSubprocess(args *subprocessArgs) (err error) {
 			for scanner.Scan() { args.stderr.Write(scanner.Bytes()) }
 			reader.Close()
 		}()
-		//cmd.Stderr = args.stderr
 	}
 
 	if args.stdin != nil { cmd.Stdin = args.stdin }
