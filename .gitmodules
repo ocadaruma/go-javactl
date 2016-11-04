@@ -1,9 +1,9 @@
 [submodule "vendor/github.com/go-yaml/yaml"]
 	path = vendor/github.com/go-yaml/yaml
-	url = git@github.com:go-yaml/yaml.git
+	url = https://github.com/go-yaml/yaml.git
 [submodule "vendor/github.com/jessevdk/go-flags"]
 	path = vendor/github.com/jessevdk/go-flags
-	url = git@github.com:jessevdk/go-flags
+	url = https://github.com/jessevdk/go-flags
 [submodule "vendor/github.com/natefinch/lumberjack"]
 	path = vendor/github.com/natefinch/lumberjack
-	url = git@github.com:natefinch/lumberjack.git
+	url = https://github.com/natefinch/lumberjack.git
