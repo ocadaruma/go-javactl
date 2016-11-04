@@ -375,7 +375,7 @@ func callSubprocess(args *subprocessArgs) (err error) {
 
 		go func() {
 			scanner := bufio.NewScanner(reader)
-			for scanner.Scan() { args.stdout.Write(scanner.Bytes()) }
+			for scanner.Scan() { args.stdout.Write([]byte(scanner.Text())) }
 			reader.Close()
 		}()
 	}
@@ -389,7 +389,7 @@ func callSubprocess(args *subprocessArgs) (err error) {
 
 		go func() {
 			scanner := bufio.NewScanner(reader)
-			for scanner.Scan() { args.stderr.Write(scanner.Bytes()) }
+			for scanner.Scan() { args.stderr.Write([]byte(scanner.Text())) }
 			reader.Close()
 		}()
 	}
