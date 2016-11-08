@@ -405,7 +405,7 @@ func callSubprocess(args *subprocessArgs) (err error) {
 		pid := cmd.Process.Pid
 		defer os.Remove(args.pidFile)
 
-		err = ioutil.WriteFile(args.pidFile, []byte(string(pid)), 0644)
+		err = ioutil.WriteFile(args.pidFile, []byte(strconv.Itoa(pid)), 0644)
 		if err != nil { return }
 
 		err = cmd.Wait()

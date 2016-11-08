@@ -53,7 +53,7 @@ func NewAppSetting(app *mapping.App) (result *AppSetting, err error) {
 }
 
 func (this *AppSetting) IsDuplicateAllowed() bool {
-	return this.PidFile != ""
+	return this.PidFile == ""
 }
 
 func (this *AppSetting) GetArgs(javaArgs []string) []string {
