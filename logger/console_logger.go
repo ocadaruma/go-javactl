@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"io"
 	"time"
-
 	"github.com/natefinch/lumberjack"
 )
 
@@ -30,7 +29,7 @@ type consoleLogger struct {
 func (this *consoleLogger) Write(p []byte) (int, error) {
 	formatted := fmt.Sprintf("[%s] %s", time.Now().Format("2006-01-02 15-04-05,000"), string(p))
 
-	return this.underlying.Write([]byte(formatted))
+	return io.WriteString(this.underlying, formatted)
 }
 
 func (this *consoleLogger) Close() error {

@@ -2,6 +2,7 @@ package logger
 
 import (
 	"fmt"
+	"io"
 	"log/syslog"
 )
 
@@ -16,7 +17,7 @@ func (this *systemLoggerStrategy) Log(level LogLevel, message string) {
 		writer, err := syslog.New(syslog.Priority(level), "")
 		if err != nil { return }
 
-		writer.Write([]byte(message))
+		io.WriteString(writer, message)
 		writer.Close()
 	}
 }

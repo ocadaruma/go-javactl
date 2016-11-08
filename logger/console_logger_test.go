@@ -1,12 +1,14 @@
 package logger
 
 import (
+	"io"
 	"io/ioutil"
 	"os"
 	"path/filepath"
 	"testing"
 	"sort"
 	"strings"
+	"time"
 )
 
 func TestConsoleLogger(t *testing.T) {
@@ -39,9 +41,11 @@ func TestConsoleLogger(t *testing.T) {
 	for i := 0; i < 1000000; i ++ { fives[i] = '5' }
 
 	for _, message := range []string{string(zeros), string(ones), string(twos), string(threes), string(fours), string(fives)} {
-		writer.Write([]byte(message + "\n"))
+		io.WriteString(writer, message + "\n")
 	}
 	writer.Close()
+
+	time.Sleep(time.Second)
 
 	files,_ := ioutil.ReadDir(dir)
 	if len(files) != 3 {
@@ -85,7 +89,7 @@ func TestConsoleLogger_Unicode(t *testing.T) {
 
 	writer := NewConsoleLogger(path, 1024 * 1024 * 1, 1)
 
-	writer.Write([]byte("あいうえお"))
+	io.WriteString(writer, "あいうえお")
 	writer.Close()
 
 	files,_ := ioutil.ReadDir(dir)
